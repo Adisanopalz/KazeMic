@@ -379,6 +379,11 @@
         const recordNotes = document.getElementById('record-notes');
         const playbackSpeed = document.getElementById('playback-speed');
         
+        // Icons for Pause/Play
+        const iconPause = document.getElementById('icon-pause');
+        const iconPlay = document.getElementById('icon-play');
+        const pauseText = document.getElementById('pause-text');
+        
         // Indicators & Overlays
         const historyList = document.getElementById('history-list');
         const historyCount = document.getElementById('history-count');
@@ -724,6 +729,7 @@
                 pauseBtn.classList.replace('bg-emerald-500', 'bg-amber-500');
                 pauseBtn.classList.replace('hover:bg-emerald-400', 'hover:bg-amber-400');
                 pauseBtn.classList.replace('shadow-emerald-500/30', 'shadow-amber-500/20');
+                pauseText.textContent = "Jeda (Spasi)";
                 
                 indicatorDot.classList.replace('bg-amber-500', 'bg-red-500');
                 indicatorDot.classList.add('animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
@@ -741,6 +747,7 @@
                 pauseBtn.classList.replace('bg-amber-500', 'bg-emerald-500');
                 pauseBtn.classList.replace('hover:bg-amber-400', 'hover:bg-emerald-400');
                 pauseBtn.classList.replace('shadow-amber-500/20', 'shadow-emerald-500/30');
+                pauseText.textContent = "Lanjut (Spasi)";
 
                 indicatorDot.classList.replace('bg-red-500', 'bg-amber-500');
                 indicatorDot.classList.remove('animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
@@ -760,6 +767,7 @@
                 iconPlay.classList.add('hidden');
                 iconPause.classList.remove('hidden');
                 pauseBtn.className = "w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-amber-500 hover:bg-amber-400 shadow-amber-500/20 text-slate-900 hover:scale-105 active:scale-95 border-4 border-slate-900";
+                pauseText.textContent = "Jeda (Spasi)";
 
                 recordingIndicator.classList.add('hidden');
                 recordingIndicator.classList.remove('flex');
@@ -795,9 +803,7 @@
 
         // Master Animation Loop (Visualizer + Volume Meter)
         function startDrawLoop() {
-            const bufferLength = analyser ? analyser.frequencyBinCount : 0;
             let dataArray = null;
-            if (analyser) dataArray = new Uint8Array(bufferLength);
 
             function draw() {
                 animationFrame = requestAnimationFrame(draw);
@@ -821,9 +827,11 @@
                     return;
                 }
 
-                if (!analyser || !dataArray) {
-                    if(audioContext && stream) dataArray = new Uint8Array(analyser.frequencyBinCount);
-                    else return;
+                if (!analyser) return;
+
+                const bufferLength = analyser.frequencyBinCount;
+                if (!dataArray || dataArray.length !== bufferLength) {
+                    dataArray = new Uint8Array(bufferLength);
                 }
 
                 // Volume Meter Math (RMS)
