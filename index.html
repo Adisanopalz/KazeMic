@@ -6,7 +6,7 @@
     <title>KazeMic - Perekam Suara Web</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Styling khusus untuk audio player agar sesuai dengan tema gelap */
+        /* Styling khusus untuk audio player dan scrollbar */
         audio {
             width: 100%;
         }
@@ -16,6 +16,9 @@
         audio::-webkit-media-controls-current-time-display,
         audio::-webkit-media-controls-time-remaining-display {
             color: #e2e8f0; /* slate-200 */
+        }
+        input[type="checkbox"] {
+            accent-color: #06b6d4; /* cyan-500 */
         }
     </style>
 </head>
@@ -38,8 +41,8 @@
             </div>
             <!-- Recording Indicator (Hidden by default) -->
             <div id="recording-indicator" class="hidden items-center space-x-2">
-                <div class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
-                <span class="text-sm font-medium text-slate-300">Merekam</span>
+                <div id="indicator-dot" class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse"></div>
+                <span id="indicator-text" class="text-sm font-medium text-slate-300">Merekam</span>
             </div>
         </div>
 
@@ -59,58 +62,97 @@
             <div class="relative w-full h-32 bg-slate-900 rounded-2xl overflow-hidden border border-slate-800 shadow-inner">
                 <canvas id="visualizer" width="400" height="128" class="w-full h-full"></canvas>
                 <!-- Timer Overlay -->
-                <div id="timer-display" class="absolute top-2 right-3 text-xs font-mono font-medium text-slate-400">
+                <div id="timer-display" class="absolute top-2 right-3 text-xs font-mono font-medium text-slate-400 bg-slate-900/80 px-2 py-1 rounded-md backdrop-blur-sm">
                     00:00
                 </div>
             </div>
 
             <!-- Controls -->
-            <div class="flex flex-col items-center space-y-4">
+            <div class="flex flex-col items-center space-y-5">
                 
-                <!-- Main Action Container (Record or Playback) -->
-                <div id="main-controls" class="w-full flex flex-col items-center space-y-4">
+                <!-- Main Action Container -->
+                <div id="main-controls" class="w-full flex flex-col items-center">
                     
-                    <!-- Record/Stop Button -->
-                    <button id="record-btn" class="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-cyan-500 hover:bg-cyan-400 hover:scale-105 shadow-cyan-500/20">
-                        <!-- Mic Icon -->
-                        <svg id="icon-mic" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900 block">
-                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                            <line x1="12" x2="12" y1="19" y2="22"></line>
-                        </svg>
-                        <!-- Square Icon (Hidden by default) -->
-                        <svg id="icon-square" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white hidden">
-                            <rect width="18" height="18" x="3" y="3" rx="2" ry="2"></rect>
-                        </svg>
-                    </button>
+                    <!-- INITIAL RECORD BUTTON -->
+                    <div id="start-section" class="flex flex-col items-center space-y-4">
+                        <button id="record-btn" class="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-cyan-500 hover:bg-cyan-400 hover:scale-105 shadow-cyan-500/20">
+                            <!-- Mic Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-900">
+                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" x2="12" y1="19" y2="22"></line>
+                            </svg>
+                        </button>
+                        
+                        <!-- Audio Settings -->
+                        <div class="flex flex-wrap justify-center gap-4 text-xs text-slate-400">
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-slate-200 transition-colors">
+                                <input type="checkbox" id="noise-suppression" checked class="w-4 h-4 rounded border-slate-700 bg-slate-800">
+                                <span>Peredam Bising</span>
+                            </label>
+                            <label class="flex items-center space-x-2 cursor-pointer hover:text-slate-200 transition-colors">
+                                <input type="checkbox" id="echo-cancellation" checked class="w-4 h-4 rounded border-slate-700 bg-slate-800">
+                                <span>Anti Gema</span>
+                            </label>
+                        </div>
+                    </div>
 
-                    <!-- Playback Section (Hidden by default) -->
-                    <div id="playback-section" class="w-full space-y-4 hidden">
+                    <!-- ACTIVE RECORDING CONTROLS (Hidden by default) -->
+                    <div id="active-recording-controls" class="hidden flex items-center space-x-6">
+                        <!-- Pause/Resume Button -->
+                        <button id="pause-btn" class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-amber-500 hover:bg-amber-400 shadow-amber-500/20 text-slate-900">
+                            <!-- Pause Icon -->
+                            <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="block">
+                                <rect width="4" height="16" x="6" y="4"></rect>
+                                <rect width="4" height="16" x="14" y="4"></rect>
+                            </svg>
+                            <!-- Play Icon (Hidden initially) -->
+                            <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden ml-1">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                        </button>
+
+                        <!-- Stop Button -->
+                        <button id="stop-btn" class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-red-500 hover:bg-red-400 hover:scale-105 shadow-red-500/20 text-white">
+                            <!-- Square Icon -->
+                            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="16" height="16" x="4" y="4" rx="2" ry="2"></rect>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- PLAYBACK & DOWNLOAD SECTION (Hidden by default) -->
+                    <div id="playback-section" class="w-full space-y-5 hidden">
                         <audio id="audio-player" controls></audio>
                         
+                        <!-- Custom Filename Input -->
+                        <div class="space-y-1.5">
+                            <label for="filename-input" class="text-xs font-medium text-slate-400 pl-1">Nama File Rekaman</label>
+                            <input type="text" id="filename-input" value="Rekaman_KazeMic" class="w-full bg-slate-800/50 border border-slate-700 rounded-xl px-4 py-2.5 text-sm text-slate-200 focus:outline-none focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 transition-all placeholder-slate-600" placeholder="Masukkan nama file...">
+                        </div>
+
+                        <!-- Action Buttons -->
                         <div class="flex space-x-3">
                             <button id="reset-btn" class="flex-1 flex items-center justify-center space-x-2 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm font-medium transition-colors">
-                                <!-- RefreshCw Icon -->
                                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
                                     <path d="M3 3v5h5"></path>
                                 </svg>
-                                <span>Rekam Ulang</span>
+                                <span>Buang & Ulang</span>
                             </button>
-                            <a id="download-btn" href="#" download="KazeMic_Recording.webm" class="flex-1 flex items-center justify-center space-x-2 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-sm font-medium transition-colors">
-                                <!-- Download Icon -->
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <a id="download-btn" href="#" download="Rekaman_KazeMic.webm" class="flex-1 flex items-center justify-center space-x-2 py-3 bg-cyan-600 hover:bg-cyan-500 text-white rounded-xl text-sm font-medium transition-colors shadow-lg shadow-cyan-600/20">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="7 10 12 15 17 10"></polyline>
                                     <line x1="12" x2="12" y1="15" y2="3"></line>
                                 </svg>
-                                <span>Unduh</span>
+                                <span>Simpan Audio</span>
                             </a>
                         </div>
                     </div>
                 </div>
 
-                <p id="helper-text" class="text-slate-400 text-sm font-medium">Ketuk untuk mulai merekam</p>
+                <p id="helper-text" class="text-slate-400 text-sm font-medium">Ketuk mic untuk mulai merekam</p>
             </div>
         </div>
     </div>
@@ -118,8 +160,10 @@
     <script>
         // State variables
         let isRecording = false;
+        let isPaused = false;
         let recordingTime = 0;
         let audioUrl = null;
+        let fileExtension = 'webm';
         
         let mediaRecorder = null;
         let audioChunks = [];
@@ -132,34 +176,53 @@
         // DOM Elements
         const canvas = document.getElementById('visualizer');
         const canvasCtx = canvas.getContext('2d');
-        const recordBtn = document.getElementById('record-btn');
-        const iconMic = document.getElementById('icon-mic');
-        const iconSquare = document.getElementById('icon-square');
+        
+        // Sections
+        const startSection = document.getElementById('start-section');
+        const activeRecordingControls = document.getElementById('active-recording-controls');
         const playbackSection = document.getElementById('playback-section');
-        const audioPlayer = document.getElementById('audio-player');
+        
+        // Buttons & Inputs
+        const recordBtn = document.getElementById('record-btn');
+        const stopBtn = document.getElementById('stop-btn');
+        const pauseBtn = document.getElementById('pause-btn');
         const resetBtn = document.getElementById('reset-btn');
         const downloadBtn = document.getElementById('download-btn');
+        const filenameInput = document.getElementById('filename-input');
+        
+        // Icons & Indicators
+        const iconPause = document.getElementById('icon-pause');
+        const iconPlay = document.getElementById('icon-play');
         const timerDisplay = document.getElementById('timer-display');
         const recordingIndicator = document.getElementById('recording-indicator');
+        const indicatorDot = document.getElementById('indicator-dot');
+        const indicatorText = document.getElementById('indicator-text');
         const helperText = document.getElementById('helper-text');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
+        const audioPlayer = document.getElementById('audio-player');
+
+        // Settings
+        const optNoise = document.getElementById('noise-suppression');
+        const optEcho = document.getElementById('echo-cancellation');
 
         // Initialize flatline on load
         drawFlatline();
 
-        // Event Listeners
-        recordBtn.addEventListener('click', () => {
-            if (isRecording) {
-                stopRecording();
-            } else {
-                startRecording();
-            }
-        });
-
+        // --- Event Listeners ---
+        recordBtn.addEventListener('click', startRecording);
+        stopBtn.addEventListener('click', stopRecording);
+        pauseBtn.addEventListener('click', togglePause);
         resetBtn.addEventListener('click', resetRecording);
 
-        // Functions
+        // Update download filename dynamically
+        filenameInput.addEventListener('input', (e) => {
+            let safeName = e.target.value.trim().replace(/[^a-z0-9_\- ]/gi, '_');
+            if (!safeName) safeName = "Rekaman_Tanpa_Nama";
+            downloadBtn.download = `${safeName}.${fileExtension}`;
+        });
+
+        // --- Core Functions ---
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = seconds % 60;
@@ -184,11 +247,20 @@
         async function startRecording() {
             hideError();
             audioChunks = [];
+            isPaused = false;
 
             try {
-                stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Terapkan pengaturan audio dari ceklis
+                const constraints = {
+                    audio: {
+                        noiseSuppression: optNoise.checked,
+                        echoCancellation: optEcho.checked
+                    }
+                };
+
+                stream = await navigator.mediaDevices.getUserMedia(constraints);
                 
-                // Setup Audio Context
+                // Setup Audio Context untuk Visualizer
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioContext = new AudioContext();
                 analyser = audioContext.createAnalyser();
@@ -196,8 +268,21 @@
                 source.connect(analyser);
                 analyser.fftSize = 2048;
 
+                // Cek format yang didukung browser
+                let mimeType = 'audio/webm';
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    mimeType = 'audio/webm;codecs=opus';
+                    fileExtension = 'webm';
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    mimeType = 'audio/mp4';
+                    fileExtension = 'mp4';
+                } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
+                    mimeType = 'audio/ogg;codecs=opus';
+                    fileExtension = 'ogg';
+                }
+
                 // Setup MediaRecorder
-                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
                 
                 mediaRecorder.ondataavailable = (event) => {
                     if (event.data.size > 0) {
@@ -206,15 +291,20 @@
                 };
 
                 mediaRecorder.onstop = () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    const audioBlob = new Blob(audioChunks, { type: mimeType });
                     audioUrl = URL.createObjectURL(audioBlob);
                     
-                    // Update UI for playback
+                    // Siapkan Pemutar Audio
                     audioPlayer.src = audioUrl;
-                    downloadBtn.href = audioUrl;
-                    downloadBtn.download = `KazeMic_${new Date().getTime()}.webm`;
                     
-                    recordBtn.classList.add('hidden');
+                    // Siapkan Tombol Download & Nama File Default
+                    const defaultName = `Rekaman_KazeMic_${new Date().getHours()}${new Date().getMinutes()}`;
+                    filenameInput.value = defaultName;
+                    downloadBtn.href = audioUrl;
+                    downloadBtn.download = `${defaultName}.${fileExtension}`;
+                    
+                    // Update UI ke mode Playback
+                    activeRecordingControls.classList.add('hidden');
                     playbackSection.classList.remove('hidden');
                     helperText.classList.add('hidden');
 
@@ -223,32 +313,77 @@
                     drawFlatline();
                 };
 
-                mediaRecorder.start();
+                mediaRecorder.start(200); // Kumpulkan data setiap 200ms
                 isRecording = true;
 
-                // Update UI for recording state
-                recordBtn.classList.remove('bg-cyan-500', 'hover:bg-cyan-400', 'shadow-cyan-500/20');
-                recordBtn.classList.add('bg-red-500', 'hover:bg-red-600', 'shadow-red-500/20');
-                iconMic.classList.add('hidden');
-                iconSquare.classList.remove('hidden');
+                // Update UI: Sembunyikan tombol mulai, tampilkan kontrol aktif (Stop/Pause)
+                startSection.classList.add('hidden');
+                activeRecordingControls.classList.remove('hidden');
+                activeRecordingControls.classList.add('flex');
+                
                 recordingIndicator.classList.remove('hidden');
                 recordingIndicator.classList.add('flex');
-                helperText.textContent = 'Ketuk untuk berhenti';
+                helperText.textContent = 'Merekam...';
+                
+                // Set indikator ke status merah (Merekam)
+                indicatorDot.classList.replace('bg-amber-500', 'bg-red-500');
+                indicatorDot.classList.add('animate-pulse');
+                indicatorText.textContent = "Merekam";
 
-                // Start Timer
+                // Mulai Timer
                 recordingTime = 0;
                 timerDisplay.textContent = formatTime(recordingTime);
-                timerInterval = setInterval(() => {
-                    recordingTime++;
-                    timerDisplay.textContent = formatTime(recordingTime);
-                }, 1000);
+                startTimer();
 
-                // Start Visualizer
+                // Mulai Visualizer
                 drawVisualizer();
 
             } catch (err) {
                 console.error("Gagal mengakses mikrofon:", err);
-                showError("Gagal mengakses mikrofon. Pastikan Anda telah memberikan izin.");
+                showError("Gagal mengakses mikrofon. Pastikan Anda memberikan izin audio.");
+            }
+        }
+
+        function togglePause() {
+            if (!mediaRecorder || !isRecording) return;
+
+            if (isPaused) {
+                // Lanjutkan rekaman (Resume)
+                mediaRecorder.resume();
+                isPaused = false;
+                startTimer();
+                
+                // Update UI Pause Button
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+                pauseBtn.classList.replace('bg-green-500', 'bg-amber-500');
+                pauseBtn.classList.replace('hover:bg-green-400', 'hover:bg-amber-400');
+                pauseBtn.classList.replace('shadow-green-500/20', 'shadow-amber-500/20');
+                
+                // Update Indikator
+                indicatorDot.classList.replace('bg-amber-500', 'bg-red-500');
+                indicatorDot.classList.add('animate-pulse');
+                indicatorText.textContent = "Merekam";
+                helperText.textContent = 'Merekam...';
+
+            } else {
+                // Jeda rekaman (Pause)
+                mediaRecorder.pause();
+                isPaused = true;
+                clearInterval(timerInterval);
+                
+                // Update UI Pause Button
+                iconPause.classList.add('hidden');
+                iconPlay.classList.remove('hidden');
+                pauseBtn.classList.replace('bg-amber-500', 'bg-green-500');
+                pauseBtn.classList.replace('hover:bg-amber-400', 'hover:bg-green-400');
+                pauseBtn.classList.replace('shadow-amber-500/20', 'shadow-green-500/20');
+
+                // Update Indikator
+                indicatorDot.classList.replace('bg-red-500', 'bg-amber-500');
+                indicatorDot.classList.remove('animate-pulse');
+                indicatorText.textContent = "Dijeda";
+                helperText.textContent = 'Rekaman dijeda';
             }
         }
 
@@ -256,14 +391,15 @@
             if (mediaRecorder && isRecording) {
                 mediaRecorder.stop();
                 isRecording = false;
-                
+                isPaused = false;
                 clearInterval(timerInterval);
                 
-                // Update UI to stop state
-                recordBtn.classList.add('bg-cyan-500', 'hover:bg-cyan-400', 'shadow-cyan-500/20');
-                recordBtn.classList.remove('bg-red-500', 'hover:bg-red-600', 'shadow-red-500/20');
-                iconMic.classList.remove('hidden');
-                iconSquare.classList.add('hidden');
+                // Kembalikan tombol pause ke tampilan semula (untuk pemakaian berikutnya)
+                iconPlay.classList.add('hidden');
+                iconPause.classList.remove('hidden');
+                pauseBtn.className = "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-amber-500 hover:bg-amber-400 shadow-amber-500/20 text-slate-900";
+
+                // Sembunyikan indikator recording di atas
                 recordingIndicator.classList.add('hidden');
                 recordingIndicator.classList.remove('flex');
             }
@@ -276,11 +412,19 @@
             hideError();
             drawFlatline();
             
-            // Reset UI to initial state
+            // Reset UI ke tampilan paling awal (sebelum merekam)
             playbackSection.classList.add('hidden');
-            recordBtn.classList.remove('hidden');
+            startSection.classList.remove('hidden');
             helperText.classList.remove('hidden');
-            helperText.textContent = 'Ketuk untuk mulai merekam';
+            helperText.textContent = 'Ketuk mic untuk mulai merekam';
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                recordingTime++;
+                timerDisplay.textContent = formatTime(recordingTime);
+            }, 1000);
         }
 
         function drawVisualizer() {
@@ -297,15 +441,21 @@
                 canvasCtx.fillStyle = '#0f172a'; // slate-900
                 canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-                canvasCtx.lineWidth = 2;
-                canvasCtx.strokeStyle = '#06b6d4'; // cyan-500
+                // Ubah warna gelombang jika dijeda
+                canvasCtx.strokeStyle = isPaused ? '#64748b' : '#06b6d4'; // slate-500 (jeda) vs cyan-500 (rekam)
+                canvasCtx.lineWidth = isPaused ? 1 : 2;
                 canvasCtx.beginPath();
 
                 const sliceWidth = canvas.width * 1.0 / bufferLength;
                 let x = 0;
 
                 for (let i = 0; i < bufferLength; i++) {
-                    const v = dataArray[i] / 128.0;
+                    // Jika dijeda, buat gelombang hampir rata
+                    let v = dataArray[i] / 128.0;
+                    if (isPaused) {
+                        v = 1 + (v - 1) * 0.1; 
+                    }
+                    
                     const y = v * canvas.height / 2;
 
                     if (i === 0) {
