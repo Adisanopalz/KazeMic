@@ -20,7 +20,7 @@
             outline: none;
         }
         audio::-webkit-media-controls-panel {
-            background-color: #1e293b; /* slate-800 */
+            background-color: #0f172a; /* slate-900 */
         }
         audio::-webkit-media-controls-current-time-display,
         audio::-webkit-media-controls-time-remaining-display {
@@ -34,8 +34,8 @@
         input[type="color"] {
             -webkit-appearance: none;
             border: none;
-            width: 32px;
-            height: 32px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             cursor: pointer;
             padding: 0;
@@ -49,218 +49,284 @@
             border-radius: 50%;
         }
 
-        /* Custom Scrollbar for History List */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        /* Custom Scrollbar for History List & Textarea */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: rgba(15, 23, 42, 0.5); border-radius: 8px;}
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #334155; border-radius: 8px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--theme-color); }
         
         /* Smooth transitions */
         .theme-transition {
-            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s;
+            transition: background-color 0.3s, color 0.3s, border-color 0.3s, box-shadow 0.3s, height 0.1s linear;
         }
     </style>
 </head>
-<body class="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans text-slate-100 selection:bg-[var(--theme-color-transparent)] selection:text-[var(--theme-color)]">
+<body class="min-h-screen bg-slate-950 flex items-center justify-center p-4 lg:p-8 font-sans text-slate-100 selection:bg-[var(--theme-color-transparent)] selection:text-[var(--theme-color)] overflow-x-hidden">
 
-    <div class="w-full max-w-md bg-slate-900 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.5)] overflow-hidden border border-slate-800 relative z-10">
+    <!-- Dashboard Container -->
+    <div class="w-full max-w-6xl bg-slate-900 rounded-3xl shadow-[0_10px_50px_rgba(0,0,0,0.6)] overflow-hidden border border-slate-800 flex flex-col relative z-10">
         
-        <!-- Header -->
-        <div class="p-5 bg-slate-800/60 flex items-center justify-between border-b border-slate-800 backdrop-blur-md">
-            <div class="flex items-center space-x-2">
-                <!-- Wind Icon -->
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--theme-color)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="theme-transition" id="header-icon">
-                    <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"></path>
-                    <path d="M9.6 4.6A2 2 0 1 1 11 8H2"></path>
-                    <path d="M12.6 19.4A2 2 0 1 0 14 16H2"></path>
-                </svg>
-                <h1 class="text-xl font-bold text-white tracking-wide flex items-center gap-1">
-                    Kaze<span class="text-[var(--theme-color)] theme-transition">Mic</span>
-                </h1>
-            </div>
-
+        <!-- Header Global -->
+        <div class="p-5 bg-slate-900 flex items-center justify-between border-b border-slate-800 z-20 shadow-sm">
             <div class="flex items-center space-x-3">
-                <!-- Recording Indicator (Hidden by default) -->
-                <div id="recording-indicator" class="hidden items-center space-x-2 bg-slate-900/50 px-2 py-1 rounded-full border border-slate-700/50">
-                    <div id="indicator-dot" class="w-2 h-2 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
-                    <span id="indicator-text" class="text-xs font-semibold text-slate-300">REC</span>
-                </div>
-                <!-- Settings Toggle Button -->
-                <button id="settings-toggle" class="p-2 bg-slate-800 hover:bg-slate-700 rounded-full text-slate-400 hover:text-white transition-all active:scale-95" title="Pengaturan">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="3"></circle>
-                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                <div class="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center shadow-inner">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--theme-color)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="theme-transition" id="header-icon">
+                        <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2"></path>
+                        <path d="M9.6 4.6A2 2 0 1 1 11 8H2"></path>
+                        <path d="M12.6 19.4A2 2 0 1 0 14 16H2"></path>
                     </svg>
-                </button>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold text-white tracking-wide flex items-center gap-1 leading-tight">
+                        Kaze<span class="text-[var(--theme-color)] theme-transition">Mic</span>
+                    </h1>
+                    <p class="text-[10px] text-slate-400 font-medium tracking-widest uppercase">Studio Dashboard</p>
+                </div>
             </div>
-        </div>
 
-        <!-- Settings Panel (Collapsible) -->
-        <div id="settings-panel" class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out bg-slate-800/40 border-slate-700/50 border-b-0">
-            <div class="p-5 space-y-4 border-b border-slate-700/50">
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium text-slate-400">Warna Tema</span>
-                    <input type="color" id="theme-color-picker" value="#06b6d4" title="Pilih Warna Tema">
+            <div class="flex items-center space-x-4">
+                <!-- Recording Indicator (Hidden by default) -->
+                <div id="recording-indicator" class="hidden items-center space-x-2 bg-slate-950 px-3 py-1.5 rounded-full border border-slate-800 shadow-inner">
+                    <div id="indicator-dot" class="w-2.5 h-2.5 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></div>
+                    <span id="indicator-text" class="text-xs font-bold text-slate-300 tracking-wider">REC</span>
                 </div>
                 
-                <div class="flex items-center justify-between">
-                    <span class="text-xs font-medium text-slate-400">Gaya Visualizer</span>
-                    <select id="visualizer-style" class="bg-slate-900 border border-slate-700 rounded-lg px-2 py-1 text-xs text-slate-200 focus:outline-none focus:border-[var(--theme-color)] cursor-pointer">
-                        <option value="wave">Gelombang (Wave)</option>
-                        <option value="bars">Balok (Bars)</option>
-                    </select>
-                </div>
-
-                <div class="flex flex-col space-y-2">
-                    <span class="text-xs font-medium text-slate-400">Pilih Mikrofon</span>
-                    <select id="mic-select" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-[var(--theme-color)] truncate cursor-pointer">
-                        <option value="">Default System Microphone</option>
-                    </select>
-                </div>
-
-                <div class="flex flex-wrap gap-4 pt-2 border-t border-slate-700/50">
-                    <label class="flex items-center space-x-2 cursor-pointer hover:text-white transition-colors text-xs text-slate-300">
-                        <input type="checkbox" id="noise-suppression" checked class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700">
-                        <span>Peredam Bising</span>
-                    </label>
-                    <label class="flex items-center space-x-2 cursor-pointer hover:text-white transition-colors text-xs text-slate-300">
-                        <input type="checkbox" id="echo-cancellation" checked class="w-3.5 h-3.5 rounded bg-slate-900 border-slate-700">
-                        <span>Anti Gema</span>
-                    </label>
+                <!-- Keyboard Shortcut Helper -->
+                <div class="hidden md:flex items-center space-x-2 text-xs text-slate-500 bg-slate-800/50 px-3 py-1.5 rounded-full border border-slate-700/50">
+                    <kbd class="px-2 py-0.5 bg-slate-700 text-slate-300 rounded font-mono text-[10px] border-b-2 border-slate-900">Spasi</kbd>
+                    <span>Mulai/Jeda</span>
                 </div>
             </div>
         </div>
 
-        <div class="p-6 space-y-6">
-            <!-- Error Message -->
-            <div id="error-message" class="hidden bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-xl flex items-start space-x-2 text-sm backdrop-blur-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
-                <span id="error-text">Terjadi kesalahan.</span>
-            </div>
-
-            <!-- Visualizer Canvas -->
-            <div class="relative w-full h-36 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] group">
-                <canvas id="visualizer" width="400" height="144" class="w-full h-full"></canvas>
-                <!-- Timer Overlay -->
-                <div id="timer-display" class="absolute top-3 right-3 text-sm font-mono font-bold text-slate-300 bg-slate-900/80 px-2.5 py-1 rounded-lg backdrop-blur-md border border-slate-700/50 shadow-lg transition-colors">
-                    00:00
-                </div>
-                <!-- Status Text Overlay (Idle) -->
-                <div id="status-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50 transition-opacity group-hover:opacity-10">
-                    <span class="text-xs font-medium tracking-[0.2em] text-slate-500 uppercase">Siap Merekam</span>
-                </div>
-            </div>
-
-            <!-- Controls -->
-            <div class="flex flex-col items-center space-y-5">
+        <!-- Layout Grid Kiri (Main) & Kanan (Sidebar) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 h-full lg:min-h-[600px] bg-slate-900">
+            
+            <!-- KOLOM KIRI (MAIN CONTENT) -->
+            <div class="lg:col-span-8 flex flex-col border-b lg:border-b-0 lg:border-r border-slate-800 p-6 space-y-6 relative">
                 
-                <!-- Main Action Container -->
-                <div id="main-controls" class="w-full flex flex-col items-center">
-                    
-                    <!-- INITIAL RECORD BUTTON -->
-                    <div id="start-section" class="flex flex-col items-center space-y-3 mt-2">
-                        <div class="relative flex items-center justify-center group">
-                            <!-- Ping Animation Background -->
-                            <div class="absolute inset-0 rounded-full bg-[var(--theme-color)] opacity-20 group-hover:animate-ping theme-transition"></div>
-                            
-                            <button id="record-btn" class="relative z-10 w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_0_20px_var(--theme-color-transparent)] bg-[var(--theme-color)] hover:bg-[var(--theme-color-hover)] hover:scale-105 active:scale-95 theme-transition">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
-                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                    <line x1="12" x2="12" y1="19" y2="22"></line>
-                                </svg>
-                            </button>
-                        </div>
-                        <p id="helper-text" class="text-slate-400 text-sm font-medium animate-pulse">Ketuk untuk mulai merekam</p>
-                    </div>
+                <!-- Error Message -->
+                <div id="error-message" class="hidden absolute top-4 left-6 right-6 z-50 bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-xl flex items-start space-x-2 text-sm backdrop-blur-md shadow-xl">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="flex-shrink-0 mt-0.5"><circle cx="12" cy="12" r="10"></circle><line x1="12" x2="12" y1="8" y2="12"></line><line x1="12" x2="12.01" y1="16" y2="16"></line></svg>
+                    <span id="error-text">Terjadi kesalahan.</span>
+                </div>
 
-                    <!-- ACTIVE RECORDING CONTROLS (Hidden by default) -->
-                    <div id="active-recording-controls" class="hidden flex items-center justify-center space-x-8 mt-2">
-                        <!-- Pause/Resume Button -->
-                        <div class="flex flex-col items-center space-y-2">
-                            <button id="pause-btn" class="w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-amber-500 hover:bg-amber-400 shadow-amber-500/20 text-slate-900 hover:scale-105 active:scale-95">
-                                <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="block">
-                                    <rect width="4" height="16" x="6" y="4" rx="1"></rect>
-                                    <rect width="4" height="16" x="14" y="4" rx="1"></rect>
-                                </svg>
-                                <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden ml-1">
-                                    <polygon points="5 3 19 12 5 21 5 3"></polygon>
-                                </svg>
-                            </button>
-                            <span id="pause-text" class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Jeda</span>
+                <!-- Area Visualizer & Meter -->
+                <div class="flex gap-4 items-stretch h-48 relative">
+                    <!-- Live Volume Meter (dB) -->
+                    <div class="w-6 bg-slate-950 rounded-2xl border border-slate-800 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] flex flex-col justify-end p-1 relative group overflow-hidden">
+                        <div class="w-full bg-[var(--theme-color)] rounded-xl theme-transition relative" id="volume-meter" style="height: 0%;">
+                            <div class="absolute top-0 left-0 right-0 h-1 bg-white/50"></div>
                         </div>
-
-                        <!-- Stop Button -->
-                        <div class="flex flex-col items-center space-y-2">
-                            <button id="stop-btn" class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-red-500 hover:bg-red-400 shadow-red-500/30 text-white hover:scale-105 active:scale-95">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect width="14" height="14" x="5" y="5" rx="2" ry="2"></rect>
-                                </svg>
-                            </button>
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Selesai</span>
+                        <div class="absolute inset-0 flex flex-col justify-between py-2 items-center pointer-events-none opacity-30 text-[8px] font-mono font-bold text-slate-400">
+                            <span>0</span>
+                            <span>-10</span>
+                            <span>-20</span>
+                            <span>-40</span>
                         </div>
                     </div>
 
-                    <!-- PLAYBACK & DOWNLOAD SECTION (Hidden by default) -->
-                    <div id="playback-section" class="w-full space-y-5 hidden animate-[fadeIn_0.5s_ease-out]">
-                        <div class="bg-slate-950 p-3 rounded-2xl border border-slate-800 shadow-inner">
-                            <audio id="audio-player" controls class="w-full"></audio>
+                    <!-- Main Canvas -->
+                    <div class="flex-1 bg-slate-950 rounded-2xl overflow-hidden border border-slate-800 shadow-[inset_0_2px_10px_rgba(0,0,0,0.5)] relative group">
+                        <canvas id="visualizer" width="800" height="200" class="w-full h-full object-cover"></canvas>
+                        
+                        <!-- Info Overlay -->
+                        <div class="absolute top-3 right-3 flex flex-col items-end gap-2">
+                            <div id="timer-display" class="text-sm font-mono font-bold text-slate-300 bg-slate-900/80 px-3 py-1 rounded-lg backdrop-blur-md border border-slate-700/50 shadow-lg transition-colors">
+                                00:00
+                            </div>
+                            <div id="size-estimate" class="hidden text-[10px] font-mono font-medium text-slate-400 bg-slate-900/80 px-2 py-0.5 rounded-md backdrop-blur-md border border-slate-800">
+                                ~0.00 MB
+                            </div>
                         </div>
                         
-                        <div class="space-y-1.5">
-                            <label for="filename-input" class="text-xs font-semibold text-slate-400 pl-1">Simpan Sebagai:</label>
-                            <div class="relative">
-                                <input type="text" id="filename-input" value="Rekaman_KazeMic" class="w-full bg-slate-800/80 border border-slate-700 rounded-xl pl-4 pr-12 py-3 text-sm text-white focus:outline-none focus:border-[var(--theme-color)] focus:ring-1 focus:ring-[var(--theme-color)] transition-all placeholder-slate-600 shadow-inner theme-transition">
-                                <span class="absolute right-4 top-3.5 text-xs font-medium text-slate-500 pointer-events-none">.webm</span>
+                        <!-- Status Text Overlay (Idle) -->
+                        <div id="status-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none opacity-50 transition-opacity group-hover:opacity-10">
+                            <span class="text-sm font-medium tracking-[0.3em] text-slate-500 uppercase flex items-center gap-2">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path><line x1="12" x2="12" y1="19" y2="22"></line></svg>
+                                Studio Siap
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CONTROLS AREA -->
+                <div class="bg-slate-800/20 border border-slate-800/50 rounded-2xl p-6 relative">
+                    <!-- Main Action Container -->
+                    <div id="main-controls" class="w-full flex flex-col items-center">
+                        
+                        <!-- INITIAL RECORD BUTTON -->
+                        <div id="start-section" class="flex flex-col items-center space-y-3">
+                            <div class="relative flex items-center justify-center group">
+                                <div class="absolute inset-0 rounded-full bg-[var(--theme-color)] opacity-20 group-hover:animate-ping theme-transition"></div>
+                                <button id="record-btn" class="relative z-10 w-24 h-24 rounded-full flex items-center justify-center transition-all duration-300 shadow-[0_0_20px_var(--theme-color-transparent)] bg-[var(--theme-color)] hover:bg-[var(--theme-color-hover)] hover:scale-105 active:scale-95 theme-transition">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                                        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                        <line x1="12" x2="12" y1="19" y2="22"></line>
+                                    </svg>
+                                </button>
+                            </div>
+                            <p id="helper-text" class="text-slate-400 text-sm font-medium animate-pulse">Ketuk mic atau spasi untuk merekam</p>
+                        </div>
+
+                        <!-- ACTIVE RECORDING CONTROLS -->
+                        <div id="active-recording-controls" class="hidden flex items-center justify-center space-x-10">
+                            <!-- Pause/Resume Button -->
+                            <div class="flex flex-col items-center space-y-2">
+                                <button id="pause-btn" class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-amber-500 hover:bg-amber-400 shadow-amber-500/20 text-slate-900 hover:scale-105 active:scale-95 border-4 border-slate-900">
+                                    <svg id="icon-pause" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="block">
+                                        <rect width="4" height="16" x="6" y="4" rx="1"></rect>
+                                        <rect width="4" height="16" x="14" y="4" rx="1"></rect>
+                                    </svg>
+                                    <svg id="icon-play" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="hidden ml-1">
+                                        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                                    </svg>
+                                </button>
+                                <span id="pause-text" class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Jeda (Spasi)</span>
+                            </div>
+
+                            <!-- Stop Button -->
+                            <div class="flex flex-col items-center space-y-2">
+                                <button id="stop-btn" class="w-20 h-20 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-red-500 hover:bg-red-400 shadow-red-500/30 text-white hover:scale-105 active:scale-95 border-4 border-slate-900">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect width="12" height="12" x="6" y="6" rx="2" ry="2"></rect>
+                                    </svg>
+                                </button>
+                                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Selesai Berhenti</span>
                             </div>
                         </div>
 
-                        <!-- Action Buttons -->
-                        <div class="flex flex-col space-y-3">
-                            <div class="flex space-x-3">
-                                <button id="reset-btn" class="flex-1 flex items-center justify-center space-x-2 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm font-medium transition-colors border border-slate-700 hover:border-slate-600">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
-                                        <path d="M3 3v5h5"></path>
-                                    </svg>
-                                    <span>Ulangi</span>
+                        <!-- PLAYBACK & DOWNLOAD SECTION -->
+                        <div id="playback-section" class="w-full hidden animate-[fadeIn_0.5s_ease-out]">
+                            
+                            <!-- Player & Speed Control -->
+                            <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow-inner mb-5">
+                                <audio id="audio-player" controls class="w-full mb-3"></audio>
+                                <div class="flex justify-end items-center space-x-2 border-t border-slate-800/50 pt-2">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg>
+                                    <span class="text-[11px] font-semibold text-slate-400">Kecepatan:</span>
+                                    <select id="playback-speed" class="bg-slate-800 border border-slate-700 rounded-md px-2 py-0.5 text-xs font-mono text-slate-200 focus:outline-none focus:border-[var(--theme-color)] cursor-pointer">
+                                        <option value="0.5">0.5x</option>
+                                        <option value="1" selected>1.0x</option>
+                                        <option value="1.5">1.5x</option>
+                                        <option value="2">2.0x</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <!-- Action Buttons -->
+                            <div class="grid grid-cols-2 gap-3 mb-4">
+                                <button id="reset-btn" class="flex items-center justify-center space-x-2 py-3 bg-slate-800 hover:bg-slate-700 rounded-xl text-sm font-medium transition-colors border border-slate-700 hover:border-slate-600 group">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="group-hover:-rotate-90 transition-transform"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+                                    <span>Rekam Baru</span>
                                 </button>
-                                <a id="download-btn" href="#" download="Rekaman_KazeMic.webm" class="flex-1 flex items-center justify-center space-x-2 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-medium transition-colors">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                        <polyline points="7 10 12 15 17 10"></polyline>
-                                        <line x1="12" x2="12" y1="15" y2="3"></line>
-                                    </svg>
-                                    <span>Unduh</span>
+                                <a id="download-btn" href="#" download="Rekaman_KazeMic.webm" class="flex items-center justify-center space-x-2 py-3 bg-slate-700 hover:bg-slate-600 text-white rounded-xl text-sm font-medium transition-colors shadow-lg">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
+                                    <span>Unduh Langsung</span>
                                 </a>
                             </div>
                             
-                            <!-- Save to Local DB Button -->
-                            <button id="save-local-btn" class="w-full flex items-center justify-center space-x-2 py-3.5 bg-[var(--theme-color)] hover:bg-[var(--theme-color-hover)] text-white rounded-xl text-sm font-bold transition-all shadow-[0_4px_15px_var(--theme-color-transparent)] hover:shadow-[0_6px_20px_var(--theme-color-transparent)] hover:-translate-y-0.5 active:translate-y-0 theme-transition">
+                            <button id="save-local-btn" class="w-full flex items-center justify-center space-x-2 py-4 bg-[var(--theme-color)] hover:bg-[var(--theme-color-hover)] text-white rounded-xl text-sm font-bold transition-all shadow-[0_4px_15px_var(--theme-color-transparent)] hover:shadow-[0_6px_20px_var(--theme-color-transparent)] hover:-translate-y-0.5 active:translate-y-0 theme-transition">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
                                     <polyline points="17 21 17 13 7 13 7 21"></polyline>
                                     <polyline points="7 3 7 8 15 8"></polyline>
                                 </svg>
-                                <span>Simpan ke Riwayat Lokal</span>
+                                <span>Simpan Permanen ke Riwayat</span>
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <!-- History Section -->
-                <div id="history-section" class="w-full pt-5 border-t border-slate-800 mt-4">
-                    <h3 class="text-sm font-semibold text-slate-300 mb-3 flex items-center justify-between">
-                        <span class="flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                            Riwayat Lokal
+                <!-- NEW: Catatan (Notes Area) -->
+                <div class="flex-1 min-h-[120px] flex flex-col space-y-2 relative group">
+                    <label class="text-xs font-bold text-slate-400 flex justify-between items-end uppercase tracking-wider">
+                        <span class="flex items-center gap-1.5">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><line x1="10" y1="9" x2="8" y2="9"></line></svg>
+                            Catatan / Lirik Lagu
                         </span>
-                        <span id="history-count" class="text-[10px] font-bold bg-slate-800 border border-slate-700 px-2 py-0.5 rounded-full text-[var(--theme-color)] theme-transition">0</span>
+                        <span class="text-[9px] text-slate-500 font-normal normal-case opacity-0 group-hover:opacity-100 transition-opacity">Tersimpan otomatis ke riwayat</span>
+                    </label>
+                    <textarea id="record-notes" class="flex-1 w-full bg-slate-950/50 border border-slate-800 rounded-2xl p-4 text-sm text-slate-200 focus:outline-none focus:border-[var(--theme-color)] focus:ring-1 focus:ring-[var(--theme-color)] transition-all resize-none shadow-inner custom-scrollbar" placeholder="Tuliskan lirik, skrip podcast, atau catatan terkait rekaman di sini..."></textarea>
+                </div>
+
+            </div>
+
+            <!-- KOLOM KANAN (SIDEBAR: SETTINGS & HISTORY) -->
+            <div class="lg:col-span-4 bg-slate-800/30 flex flex-col h-full max-h-[800px] overflow-hidden">
+                
+                <!-- Settings Panel (Always Visible on Desktop) -->
+                <div class="p-5 border-b border-slate-700/50 bg-slate-800/40 shrink-0">
+                    <h3 class="text-xs font-bold text-slate-300 mb-4 flex items-center gap-2 tracking-widest uppercase">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        Pengaturan Audio
                     </h3>
-                    <div id="history-list" class="space-y-2.5 max-h-48 overflow-y-auto pr-1.5 custom-scrollbar">
-                        <!-- History items will be injected here -->
+                    
+                    <div class="space-y-4">
+                        <!-- Custom Filename -->
+                        <div class="space-y-1.5">
+                            <span class="text-[11px] font-semibold text-slate-400">Nama File Target</span>
+                            <div class="relative">
+                                <input type="text" id="filename-input" value="Rekaman_KazeMic" class="w-full bg-slate-900 border border-slate-700 rounded-xl pl-3 pr-10 py-2.5 text-xs text-white focus:outline-none focus:border-[var(--theme-color)] transition-all placeholder-slate-600 shadow-inner">
+                                <span class="absolute right-3 top-2.5 text-[10px] font-medium text-slate-500 pointer-events-none" id="file-ext-display">.webm</span>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-xs font-semibold text-slate-400">Warna Aksen</span>
+                            <input type="color" id="theme-color-picker" value="#06b6d4" title="Pilih Warna Tema">
+                        </div>
+                        
+                        <div class="flex items-center justify-between bg-slate-900 p-2.5 rounded-xl border border-slate-800">
+                            <span class="text-xs font-semibold text-slate-400">Tampilan Efek</span>
+                            <select id="visualizer-style" class="bg-slate-800 border-none rounded-lg px-2 py-1 text-xs text-[var(--theme-color)] font-bold focus:outline-none cursor-pointer">
+                                <option value="wave">Gelombang</option>
+                                <option value="bars">Balok</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col space-y-1.5">
+                            <span class="text-[11px] font-semibold text-slate-400">Input Mikrofon</span>
+                            <select id="mic-select" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-xs text-slate-200 focus:outline-none focus:border-[var(--theme-color)] truncate cursor-pointer shadow-inner">
+                                <option value="">Default System Microphone</option>
+                            </select>
+                        </div>
+
+                        <div class="flex flex-col gap-2 pt-1">
+                            <label class="flex items-center space-x-3 cursor-pointer hover:text-white transition-colors text-xs text-slate-300 bg-slate-900 p-2 rounded-lg border border-slate-800">
+                                <input type="checkbox" id="noise-suppression" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700">
+                                <div class="flex flex-col">
+                                    <span class="font-bold">Peredam Bising</span>
+                                    <span class="text-[9px] text-slate-500 font-normal">Mengurangi suara kipas/latar</span>
+                                </div>
+                            </label>
+                            <label class="flex items-center space-x-3 cursor-pointer hover:text-white transition-colors text-xs text-slate-300 bg-slate-900 p-2 rounded-lg border border-slate-800">
+                                <input type="checkbox" id="echo-cancellation" checked class="w-4 h-4 rounded bg-slate-800 border-slate-700">
+                                <div class="flex flex-col">
+                                    <span class="font-bold">Anti Gema</span>
+                                    <span class="text-[9px] text-slate-500 font-normal">Mencegah feedback suara</span>
+                                </div>
+                            </label>
+                        </div>
                     </div>
                 </div>
+
+                <!-- History Section (Fills remaining height) -->
+                <div id="history-section" class="flex-1 flex flex-col p-5 overflow-hidden">
+                    <h3 class="text-xs font-bold text-slate-300 mb-3 flex items-center justify-between tracking-widest uppercase shrink-0">
+                        <span class="flex items-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                            Perpustakaan
+                        </span>
+                        <span id="history-count" class="text-[10px] font-bold bg-slate-900 border border-slate-700 px-2.5 py-0.5 rounded-full text-[var(--theme-color)] theme-transition">0</span>
+                    </h3>
+                    
+                    <div id="history-list" class="flex-1 space-y-2.5 overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- History items injected here -->
+                    </div>
+                </div>
+                
             </div>
         </div>
     </div>
@@ -284,60 +350,58 @@
         let timerInterval = null;
         
         let currentThemeColor = '#06b6d4';
-        let idleOffset = 0; // For idle animation
+        let idleOffset = 0;
 
         // DOM Elements
         const canvas = document.getElementById('visualizer');
         const canvasCtx = canvas.getContext('2d');
         const rootStyles = document.documentElement;
         
-        // Sections & Panels
+        // Sections
         const startSection = document.getElementById('start-section');
         const activeRecordingControls = document.getElementById('active-recording-controls');
         const playbackSection = document.getElementById('playback-section');
-        const settingsPanel = document.getElementById('settings-panel');
         
-        // Buttons & Inputs
+        // Buttons
         const recordBtn = document.getElementById('record-btn');
         const stopBtn = document.getElementById('stop-btn');
         const pauseBtn = document.getElementById('pause-btn');
         const resetBtn = document.getElementById('reset-btn');
         const downloadBtn = document.getElementById('download-btn');
         const saveLocalBtn = document.getElementById('save-local-btn');
-        const settingsToggle = document.getElementById('settings-toggle');
         
+        // Inputs
         const filenameInput = document.getElementById('filename-input');
+        const fileExtDisplay = document.getElementById('file-ext-display');
         const micSelect = document.getElementById('mic-select');
         const colorPicker = document.getElementById('theme-color-picker');
         const visStyleSelect = document.getElementById('visualizer-style');
+        const recordNotes = document.getElementById('record-notes');
+        const playbackSpeed = document.getElementById('playback-speed');
         
-        // Lists & Texts
+        // Indicators & Overlays
         const historyList = document.getElementById('history-list');
         const historyCount = document.getElementById('history-count');
         const timerDisplay = document.getElementById('timer-display');
-        const helperText = document.getElementById('helper-text');
+        const sizeEstimate = document.getElementById('size-estimate');
+        const volumeMeter = document.getElementById('volume-meter');
         const statusOverlay = document.getElementById('status-overlay');
-        
-        // Icons & Indicators
-        const iconPause = document.getElementById('icon-pause');
-        const iconPlay = document.getElementById('icon-play');
-        const pauseText = document.getElementById('pause-text');
         const recordingIndicator = document.getElementById('recording-indicator');
         const indicatorDot = document.getElementById('indicator-dot');
         const indicatorText = document.getElementById('indicator-text');
         const errorMessage = document.getElementById('error-message');
         const errorText = document.getElementById('error-text');
+        
+        // Audio Player
         const audioPlayer = document.getElementById('audio-player');
-
-        // Settings
+        
+        // Settings Checkboxes
         const optNoise = document.getElementById('noise-suppression');
         const optEcho = document.getElementById('echo-cancellation');
 
-        // --- Init Theme & Animation ---
+        // --- Init Theme & Tools ---
         function hexToRgba(hex, alpha) {
-            let r = parseInt(hex.slice(1, 3), 16),
-                g = parseInt(hex.slice(3, 5), 16),
-                b = parseInt(hex.slice(5, 7), 16);
+            let r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
             return `rgba(${r}, ${g}, ${b}, ${alpha})`;
         }
 
@@ -348,7 +412,6 @@
             localStorage.setItem('kazemic_theme', color);
         }
 
-        // Load saved theme
         const savedTheme = localStorage.getItem('kazemic_theme');
         if (savedTheme) {
             colorPicker.value = savedTheme;
@@ -356,9 +419,27 @@
         }
 
         colorPicker.addEventListener('input', (e) => updateTheme(e.target.value));
+        
+        playbackSpeed.addEventListener('change', (e) => {
+            audioPlayer.playbackRate = parseFloat(e.target.value);
+        });
 
-        // Start Canvas Animation Loop
+        // Start Canvas Background Loop
         startDrawLoop();
+
+        // --- Keyboard Shortcuts ---
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (!startSection.classList.contains('hidden')) {
+                    recordBtn.click();
+                } else if (!activeRecordingControls.classList.contains('hidden')) {
+                    pauseBtn.click();
+                }
+            }
+        });
 
         // --- Event Listeners ---
         recordBtn.addEventListener('click', startRecording);
@@ -366,31 +447,16 @@
         pauseBtn.addEventListener('click', togglePause);
         resetBtn.addEventListener('click', resetRecording);
         saveLocalBtn.addEventListener('click', saveToLocal);
-        
-        settingsToggle.addEventListener('click', () => {
-            if (settingsPanel.classList.contains('max-h-0')) {
-                settingsPanel.classList.replace('max-h-0', 'max-h-96');
-                settingsPanel.classList.add('border-b');
-                settingsToggle.classList.add('bg-slate-700', 'text-white');
-            } else {
-                settingsPanel.classList.replace('max-h-96', 'max-h-0');
-                settingsPanel.classList.remove('border-b');
-                settingsToggle.classList.remove('bg-slate-700', 'text-white');
-            }
-        });
 
-        // Update download filename dynamically
         filenameInput.addEventListener('input', (e) => {
             let safeName = e.target.value.trim().replace(/[^a-z0-9_\- ]/gi, '_');
-            if (!safeName) safeName = "Rekaman_Tanpa_Nama";
+            if (!safeName) safeName = "Rekaman_KazeMic";
             downloadBtn.download = `${safeName}.${fileExtension}`;
         });
 
-        // --- Core Functions ---
-        
-        // Initialize IndexedDB
+        // --- DB Functions ---
         function initDB() {
-            const request = indexedDB.open('KazeMicDB', 1);
+            const request = indexedDB.open('KazeMicDB', 2); // Upgrade version if needed
             request.onupgradeneeded = (e) => {
                 db = e.target.result;
                 if (!db.objectStoreNames.contains('recordings')) {
@@ -405,18 +471,15 @@
         }
         initDB();
 
-        // Load Microphones list
         async function loadMicrophones() {
             try {
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const audioInputs = devices.filter(device => device.kind === 'audioinput');
-                
                 micSelect.innerHTML = '';
                 if (audioInputs.length === 0) {
                     micSelect.innerHTML = '<option value="">Mikrofon Default</option>';
                     return;
                 }
-
                 audioInputs.forEach((device, index) => {
                     const option = document.createElement('option');
                     option.value = device.deviceId;
@@ -430,16 +493,16 @@
         }
         loadMicrophones();
 
-        // Save to Local DB
         function saveToLocal() {
             if (!currentAudioBlob || !db) return;
             
             const recData = {
                 id: Date.now(),
-                name: filenameInput.value || 'Rekaman_Tanpa_Nama',
+                name: filenameInput.value || 'Rekaman_KazeMic',
                 blob: currentAudioBlob,
                 duration: recordingTime,
-                date: new Date().toLocaleString('id-ID')
+                date: new Date().toLocaleString('id-ID'),
+                notes: recordNotes.value // Simpan catatan
             };
             
             const tx = db.transaction('recordings', 'readwrite');
@@ -448,12 +511,10 @@
             
             tx.oncomplete = () => {
                 loadHistory();
-                
-                // Visual feedback (Success animation)
                 const originalHTML = saveLocalBtn.innerHTML;
                 saveLocalBtn.innerHTML = `
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" class="animate-bounce"><polyline points="20 6 9 17 4 12"></polyline></svg>
-                    <span>Tersimpan!</span>
+                    <span>Tersimpan di Perpustakaan!</span>
                 `;
                 saveLocalBtn.classList.replace('bg-[var(--theme-color)]', 'bg-emerald-500');
                 saveLocalBtn.classList.replace('hover:bg-[var(--theme-color-hover)]', 'hover:bg-emerald-400');
@@ -468,7 +529,6 @@
             };
         }
 
-        // Load History from Local DB
         function loadHistory() {
             if (!db) return;
             const tx = db.transaction('recordings', 'readonly');
@@ -481,31 +541,36 @@
                 historyList.innerHTML = '';
                 
                 if(recordings.length === 0) {
-                    historyList.innerHTML = '<p class="text-xs text-slate-500 text-center py-6 font-medium bg-slate-900/50 rounded-xl border border-slate-800/50">Belum ada rekaman tersimpan.</p>';
+                    historyList.innerHTML = '<div class="flex flex-col items-center justify-center py-10 opacity-30"><svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mb-2"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M19 10v2a7 7 0 0 1-14 0v-2"></path></svg><p class="text-xs font-medium">Kosong.</p></div>';
                     return;
                 }
 
                 recordings.forEach(rec => {
                     const item = document.createElement('div');
-                    item.className = 'bg-slate-800/50 p-3 rounded-xl border border-slate-700/50 flex items-center justify-between group hover:bg-slate-800 hover:border-[var(--theme-color-transparent)] transition-all duration-300';
+                    item.className = 'bg-slate-900 p-3 rounded-xl border border-slate-700/50 flex flex-col group hover:border-[var(--theme-color-transparent)] hover:shadow-lg transition-all duration-300';
                     
                     const blobUrl = URL.createObjectURL(rec.blob);
+                    const hasNotes = rec.notes && rec.notes.trim().length > 0;
+                    const notesIcon = hasNotes ? `<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-amber-400 ml-1"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"></path><polyline points="14 2 14 8 20 8"></polyline></svg>` : '';
                     
+                    // Escaping quotes for function call
+                    const safeName = rec.name.replace(/'/g, "\\'");
+                    const safeNotes = (rec.notes || '').replace(/'/g, "\\'").replace(/\n/g, "\\n");
+
                     item.innerHTML = `
-                        <div class="flex flex-col overflow-hidden mr-3">
-                            <span class="text-sm font-bold text-slate-200 truncate group-hover:text-white transition-colors" title="${rec.name}">${rec.name}</span>
-                            <span class="text-[10px] font-medium text-slate-500 mt-1 tracking-wide uppercase">${rec.date} • ${formatTime(rec.duration)}</span>
-                        </div>
-                        <div class="flex space-x-2 shrink-0 opacity-100 sm:opacity-70 sm:group-hover:opacity-100 transition-opacity">
-                            <button onclick="playHistory('${blobUrl}', '${rec.name}')" class="w-8 h-8 rounded-lg bg-slate-700 hover:bg-[var(--theme-color)] hover:shadow-[0_0_10px_var(--theme-color-transparent)] flex items-center justify-center text-slate-300 hover:text-white transition-all theme-transition" title="Putar & Edit">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                            </button>
-                            <a href="${blobUrl}" download="${rec.name}.${fileExtension}" class="w-8 h-8 rounded-lg bg-slate-700 hover:bg-emerald-500 hover:shadow-[0_0_10px_rgba(16,185,129,0.3)] flex items-center justify-center text-slate-300 hover:text-white transition-all" title="Unduh Langsung">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" x2="12" y1="15" y2="3"></line></svg>
-                            </a>
-                            <button onclick="deleteHistory(${rec.id})" class="w-8 h-8 rounded-lg bg-slate-700 hover:bg-rose-500 hover:shadow-[0_0_10px_rgba(244,63,94,0.3)] flex items-center justify-center text-slate-300 hover:text-white transition-all" title="Hapus">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
-                            </button>
+                        <div class="flex items-center justify-between">
+                            <div class="flex flex-col overflow-hidden mr-2">
+                                <span class="text-xs font-bold text-slate-200 truncate group-hover:text-white transition-colors flex items-center" title="${rec.name}">${rec.name} ${notesIcon}</span>
+                                <span class="text-[9px] font-medium text-slate-500 mt-1 tracking-widest uppercase">${rec.date} • ${formatTime(rec.duration)}</span>
+                            </div>
+                            <div class="flex space-x-1.5 shrink-0 opacity-100 xl:opacity-0 xl:group-hover:opacity-100 transition-opacity">
+                                <button onclick="playHistory('${blobUrl}', '${safeName}', '${safeNotes}')" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-[var(--theme-color)] hover:shadow-[0_0_10px_var(--theme-color-transparent)] flex items-center justify-center text-slate-300 hover:text-white transition-all theme-transition" title="Buka & Putar">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                                </button>
+                                <button onclick="deleteHistory(${rec.id})" class="w-7 h-7 rounded-lg bg-slate-800 hover:bg-rose-500 hover:shadow-[0_0_10px_rgba(244,63,94,0.3)] flex items-center justify-center text-slate-300 hover:text-white transition-all" title="Hapus">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                                </button>
+                            </div>
                         </div>
                     `;
                     historyList.appendChild(item);
@@ -513,25 +578,25 @@
             };
         }
 
-        // Global functions for History Buttons
-        window.playHistory = (url, name) => {
+        window.playHistory = (url, name, notes) => {
             audioPlayer.src = url;
             audioPlayer.play().catch(e => console.log("Auto-play prevented", e));
             filenameInput.value = name;
             downloadBtn.href = url;
             downloadBtn.download = `${name}.${fileExtension}`;
             
+            // Muat kembali catatan
+            recordNotes.value = notes || '';
+            
             playbackSection.classList.remove('hidden');
             startSection.classList.add('hidden');
             activeRecordingControls.classList.add('hidden');
             statusOverlay.classList.add('hidden');
-            
-            // Auto close settings panel if open
-            if (!settingsPanel.classList.contains('max-h-0')) settingsToggle.click();
+            sizeEstimate.classList.add('hidden');
         };
 
         window.deleteHistory = (id) => {
-            if(confirm("Anda yakin ingin menghapus rekaman ini dari riwayat?")) {
+            if(confirm("Hapus file rekaman permanen ini?")) {
                 const tx = db.transaction('recordings', 'readwrite');
                 const store = tx.objectStore('recordings');
                 store.delete(id);
@@ -548,6 +613,7 @@
         function showError(msg) {
             errorText.textContent = msg;
             errorMessage.classList.remove('hidden');
+            setTimeout(()=> { errorMessage.classList.add('hidden'); }, 5000);
         }
 
         function hideError() {
@@ -564,6 +630,7 @@
             isPaused = false;
             currentAudioBlob = null;
             statusOverlay.classList.add('hidden');
+            sizeEstimate.classList.remove('hidden');
 
             try {
                 const constraints = {
@@ -572,15 +639,11 @@
                         echoCancellation: optEcho.checked
                     }
                 };
-
-                if (micSelect.value) {
-                    constraints.audio.deviceId = { exact: micSelect.value };
-                }
+                if (micSelect.value) constraints.audio.deviceId = { exact: micSelect.value };
 
                 stream = await navigator.mediaDevices.getUserMedia(constraints);
-                loadMicrophones(); // Refresh names if permissions just granted
+                loadMicrophones(); 
                 
-                // Setup Audio Context untuk Visualizer
                 const AudioContext = window.AudioContext || window.webkitAudioContext;
                 audioContext = new AudioContext();
                 analyser = audioContext.createAnalyser();
@@ -588,18 +651,15 @@
                 source.connect(analyser);
                 analyser.fftSize = 2048;
 
-                // Cek format codec
                 let mimeType = 'audio/webm';
                 if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
-                    mimeType = 'audio/webm;codecs=opus';
-                    fileExtension = 'webm';
+                    mimeType = 'audio/webm;codecs=opus'; fileExtension = 'webm';
                 } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
-                    mimeType = 'audio/mp4';
-                    fileExtension = 'mp4';
+                    mimeType = 'audio/mp4'; fileExtension = 'mp4';
                 } else if (MediaRecorder.isTypeSupported('audio/ogg;codecs=opus')) {
-                    mimeType = 'audio/ogg;codecs=opus';
-                    fileExtension = 'ogg';
+                    mimeType = 'audio/ogg;codecs=opus'; fileExtension = 'ogg';
                 }
+                fileExtDisplay.textContent = '.' + fileExtension;
 
                 mediaRecorder = new MediaRecorder(stream, { mimeType: mimeType });
                 
@@ -610,48 +670,43 @@
                 mediaRecorder.onstop = () => {
                     currentAudioBlob = new Blob(audioChunks, { type: mimeType });
                     audioUrl = URL.createObjectURL(currentAudioBlob);
-                    
                     audioPlayer.src = audioUrl;
+                    audioPlayer.playbackRate = parseFloat(playbackSpeed.value);
                     
                     const defaultName = `KazeMic_${new Date().getFullYear()}${(new Date().getMonth()+1).toString().padStart(2,'0')}${new Date().getDate()}_${new Date().getHours()}${new Date().getMinutes()}`;
-                    filenameInput.value = defaultName;
+                    if(filenameInput.value === 'Rekaman_KazeMic' || filenameInput.value.trim() === '') {
+                        filenameInput.value = defaultName;
+                    }
                     downloadBtn.href = audioUrl;
-                    downloadBtn.download = `${defaultName}.${fileExtension}`;
+                    downloadBtn.download = `${filenameInput.value}.${fileExtension}`;
                     
-                    // Update UI ke mode Playback
                     activeRecordingControls.classList.add('hidden');
                     playbackSection.classList.remove('hidden');
-
                     stopMediaTracks();
+                    volumeMeter.style.height = '0%';
                 };
 
                 mediaRecorder.start(200); 
                 isRecording = true;
 
-                // Update UI Navigation
                 startSection.classList.add('hidden');
                 activeRecordingControls.classList.remove('hidden');
                 
-                // Indicators
                 recordingIndicator.classList.remove('hidden');
                 recordingIndicator.classList.add('flex');
                 indicatorDot.classList.replace('bg-amber-500', 'bg-red-500');
                 indicatorDot.classList.add('animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
                 indicatorText.textContent = "REC";
                 indicatorText.classList.replace('text-amber-400', 'text-red-400');
-                
                 timerDisplay.classList.add('text-[var(--theme-color)]');
 
                 recordingTime = 0;
                 timerDisplay.textContent = formatTime(recordingTime);
                 startTimer();
-                
-                // Tutup settings panel saat rekam mulai
-                if (!settingsPanel.classList.contains('max-h-0')) settingsToggle.click();
 
             } catch (err) {
                 console.error("Gagal akses mikrofon:", err);
-                showError("Gagal mengakses mikrofon. Pastikan izin audio diberikan.");
+                showError("Mikrofon diblokir. Izinkan akses mikrofon di browser Anda.");
                 statusOverlay.classList.remove('hidden');
             }
         }
@@ -669,7 +724,6 @@
                 pauseBtn.classList.replace('bg-emerald-500', 'bg-amber-500');
                 pauseBtn.classList.replace('hover:bg-emerald-400', 'hover:bg-amber-400');
                 pauseBtn.classList.replace('shadow-emerald-500/30', 'shadow-amber-500/20');
-                pauseText.textContent = "Jeda";
                 
                 indicatorDot.classList.replace('bg-amber-500', 'bg-red-500');
                 indicatorDot.classList.add('animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
@@ -687,7 +741,6 @@
                 pauseBtn.classList.replace('bg-amber-500', 'bg-emerald-500');
                 pauseBtn.classList.replace('hover:bg-amber-400', 'hover:bg-emerald-400');
                 pauseBtn.classList.replace('shadow-amber-500/20', 'shadow-emerald-500/30');
-                pauseText.textContent = "Lanjut";
 
                 indicatorDot.classList.replace('bg-red-500', 'bg-amber-500');
                 indicatorDot.classList.remove('animate-pulse', 'shadow-[0_0_8px_rgba(239,68,68,0.8)]');
@@ -706,8 +759,7 @@
                 
                 iconPlay.classList.add('hidden');
                 iconPause.classList.remove('hidden');
-                pauseBtn.className = "w-14 h-14 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-amber-500 hover:bg-amber-400 shadow-amber-500/20 text-slate-900 hover:scale-105 active:scale-95";
-                pauseText.textContent = "Jeda";
+                pauseBtn.className = "w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 shadow-lg bg-amber-500 hover:bg-amber-400 shadow-amber-500/20 text-slate-900 hover:scale-105 active:scale-95 border-4 border-slate-900";
 
                 recordingIndicator.classList.add('hidden');
                 recordingIndicator.classList.remove('flex');
@@ -719,6 +771,9 @@
             audioUrl = null;
             recordingTime = 0;
             timerDisplay.textContent = formatTime(recordingTime);
+            sizeEstimate.textContent = '~0.00 MB';
+            sizeEstimate.classList.add('hidden');
+            recordNotes.value = ''; // Reset notes on fresh record
             hideError();
             
             playbackSection.classList.add('hidden');
@@ -731,10 +786,14 @@
             timerInterval = setInterval(() => {
                 recordingTime++;
                 timerDisplay.textContent = formatTime(recordingTime);
+                
+                // Estimate size (roughly 1.5MB per minute for standard opus webm)
+                let mb = (recordingTime * 0.025).toFixed(2);
+                sizeEstimate.textContent = `~${mb} MB`;
             }, 1000);
         }
 
-        // Unified Draw Loop handles Idle, Wave, and Bars
+        // Master Animation Loop (Visualizer + Volume Meter)
         function startDrawLoop() {
             const bufferLength = analyser ? analyser.frequencyBinCount : 0;
             let dataArray = null;
@@ -746,7 +805,7 @@
                 canvasCtx.fillStyle = '#020617'; // slate-950
                 canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
 
-                // Idle Animation (When not recording and not playing back)
+                // Jika idle (tidak merekam / tidak memutar)
                 if (!isRecording && !audioUrl) {
                     canvasCtx.lineWidth = 2;
                     canvasCtx.strokeStyle = '#1e293b'; // slate-800
@@ -754,36 +813,51 @@
                     canvasCtx.beginPath();
                     let y = canvas.height / 2;
                     for (let x = 0; x < canvas.width; x++) {
-                        // Smooth sine wave
                         canvasCtx.lineTo(x, y + Math.sin(x * 0.02 + idleOffset) * 15);
                     }
                     canvasCtx.stroke();
                     idleOffset += 0.04;
+                    volumeMeter.style.height = '0%';
                     return;
                 }
 
                 if (!analyser || !dataArray) {
-                    if(audioContext && stream) {
-                        dataArray = new Uint8Array(analyser.frequencyBinCount);
-                    } else return;
+                    if(audioContext && stream) dataArray = new Uint8Array(analyser.frequencyBinCount);
+                    else return;
                 }
 
+                // Volume Meter Math (RMS)
+                let sum = 0;
+                analyser.getByteTimeDomainData(dataArray); // ambil data untuk gelombang dan volume
+                
+                for (let i = 0; i < bufferLength; i++) {
+                    let vRMS = (dataArray[i] - 128);
+                    sum += (vRMS * vRMS);
+                }
+                let rms = Math.sqrt(sum / bufferLength);
+                let volumePct = Math.min(100, (rms / 64) * 100); // normalized
+                
+                if(isPaused) volumePct = 0;
+                // update meter UI smoothly
+                volumeMeter.style.height = `${volumePct}%`;
+
+
+                // Visualizer Draw
                 const style = visStyleSelect.value;
                 canvasCtx.shadowColor = isPaused ? 'transparent' : currentThemeColor;
-                canvasCtx.shadowBlur = isPaused ? 0 : 12;
+                canvasCtx.shadowBlur = isPaused ? 0 : 15;
 
                 if (style === 'wave') {
-                    analyser.getByteTimeDomainData(dataArray);
                     canvasCtx.lineWidth = isPaused ? 1.5 : 3;
                     canvasCtx.strokeStyle = isPaused ? '#64748b' : currentThemeColor;
                     canvasCtx.beginPath();
 
-                    const sliceWidth = canvas.width * 1.0 / analyser.frequencyBinCount;
+                    const sliceWidth = canvas.width * 1.0 / bufferLength;
                     let x = 0;
 
-                    for (let i = 0; i < analyser.frequencyBinCount; i++) {
+                    for (let i = 0; i < bufferLength; i++) {
                         let v = dataArray[i] / 128.0;
-                        if (isPaused) v = 1 + (v - 1) * 0.15; // Flatten if paused
+                        if (isPaused) v = 1 + (v - 1) * 0.15;
                         const y = v * canvas.height / 2;
 
                         if (i === 0) canvasCtx.moveTo(x, y);
@@ -794,25 +868,20 @@
                     canvasCtx.stroke();
                 } else {
                     // Bars Style
-                    analyser.getByteFrequencyData(dataArray);
-                    const barWidth = (canvas.width / analyser.frequencyBinCount) * 3;
+                    analyser.getByteFrequencyData(dataArray); // replace data with frequency
+                    const barWidth = (canvas.width / bufferLength) * 3.5;
                     let barHeight;
                     let x = 0;
                     
                     canvasCtx.fillStyle = isPaused ? '#64748b' : currentThemeColor;
-                    
-                    // Draw mirror bars from center
                     const midY = canvas.height / 2;
                     
-                    for (let i = 0; i < analyser.frequencyBinCount; i++) {
+                    for (let i = 0; i < bufferLength; i++) {
                         barHeight = dataArray[i] / 2;
                         if (isPaused) barHeight = barHeight * 0.2;
                         
-                        // Top half
-                        canvasCtx.fillRect(x, midY - barHeight, barWidth - 1, barHeight);
-                        // Bottom half (reflection)
-                        canvasCtx.fillRect(x, midY, barWidth - 1, barHeight);
-                        
+                        canvasCtx.fillRect(x, midY - barHeight, barWidth - 1.5, barHeight);
+                        canvasCtx.fillRect(x, midY, barWidth - 1.5, barHeight);
                         x += barWidth;
                     }
                 }
